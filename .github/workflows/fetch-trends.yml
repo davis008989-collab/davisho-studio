@@ -24,7 +24,14 @@ jobs:
       - name: Fetch trends
         run: |
           mkdir -p data
-          python scripts/fetch-trends.py
+          python scripts/fetch-trends.py 2>&1 | tee data/fetch.log
+      
+      - name: Upload log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fetch-log
+          path: data/fetch.log
       
       - name: Commit and push
         run: |

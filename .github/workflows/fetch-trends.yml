@@ -17,10 +17,14 @@ jobs:
           python-version: '3.11'
       
       - name: Install dependencies
-        run: pip install requests feedparser beautifulsoup4
+        run: |
+          pip install requests feedparser beautifulsoup4
+          python -c "import feedparser; print('feedparser version:', feedparser.__version__)"
       
       - name: Fetch trends
-        run: python scripts/fetch-trends.py
+        run: |
+          mkdir -p data
+          python scripts/fetch-trends.py
       
       - name: Commit and push
         run: |

@@ -1,51 +1,65 @@
 #!/usr/bin/env python3
 """Fetch digital trends from multiple sources."""
 import json
+import os
+import sys
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-def fetch_rss(url, source_name, limit=8):
-    """Fetch RSS feed and return trends."""
+# Ensure data directory exists
+os.makedirs("data", exist_ok=True)
+
+def fetch_rss_manual(url, source_name, limit=8):
+    """Manual RSS parsing without feedparser."""
     trends = []
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'},
+            timeout=15
+        )
+        with urllib.request.urlopen(req) as resp:
             content = resp.read()
+            content_str = content.decode('utf-8', errors='ignore')
+            
+            # Parse RSS items manually
+            items = []
+            in_item = False
+            current_item = {}
+            
+            # Simple XML parsing approach
             try:
                 root = ET.fromstring(content)
-            except ET.ParseError:
-                content_str = content.decode('utf-8', errors='ignore')
-                if '<rss' in content_str:
-                    start = content_str.find('<rss')
-                    root = ET.fromstring(content_str[start:])
-                else:
-                    return trends
-            
-            items = []
-            for item in root.iter('item'):
-                title = None
-                link = None
-                for child in item:
-                    if child.tag == 'title':
-                        title = child.text or ''
-                    elif child.tag == 'link':
-                        link = child.text or ''
-                if title:
-                    items.append({'title': title, 'link': link or url})
-                if len(items) >= limit:
-                    break
+                for item in root.iter('item'):
+                    title = None
+                    link = None
+                    for child in item:
+                        tag = child.tag.split('}')[-1] if '}' in child.tag else child.tag
+                        if tag == 'title':
+                            title = (child.text or '').strip()
+                        elif tag == 'link':
+                            link = (child.text or '').strip()
+                    if title:
+                        items.append({'title': title, 'link': link or url})
+                    if len(items) >= limit:
+                        break
+            except ET.ParseError as e:
+                print(f"    XML parse error for {source_name}: {e}")
+                return trends
             
             for i, entry in enumerate(items):
                 trends.append({
                     "rank": i + 1,
-                    "title": entry['title'][:60],
+                    "title": entry['title'][:80],
                     "source": source_name,
                     "heat": max(95 - i * 5, 55),
                     "url": entry['link']
                 })
+    except urllib.error.URLError as e:
+        print(f"    URL error for {source_name}: {e}")
     except Exception as e:
-        print(f"  {source_name} RSS error: {e}")
+        print(f"    Unexpected error for {source_name}: {type(e).__name__}: {e}")
     return trends
 
 def fetch_with_feedparser(url, source_name, limit=8):
@@ -53,21 +67,33 @@ def fetch_with_feedparser(url, source_name, limit=8):
     try:
         import feedparser
         trends = []
+        print(f"    Trying feedparser for {source_name}...")
         feed = feedparser.parse(url)
-        for i, entry in enumerate(feed.entries[:limit]):
+        
+        if feed.bozo and hasattr(feed, 'bozo_exception'):
+            print(f"    Feedparser warning for {source_name}: {feed.bozo_exception}")
+        
+        entries = feed.entries[:limit] if hasattr(feed, 'entries') else []
+        print(f"    Feedparser found {len(entries)} entries for {source_name}")
+        
+        for i, entry in enumerate(entries):
+            title = entry.title if hasattr(entry, 'title') else ''
+            link = entry.link if hasattr(entry, 'link') else url
             trends.append({
                 "rank": i + 1,
-                "title": (entry.title or '')[:60],
+                "title": title[:80],
                 "source": source_name,
                 "heat": max(95 - i * 5, 55),
-                "url": entry.get('link', url)
+                "url": link
             })
         return trends
     except ImportError:
-        return fetch_rss(url, source_name, limit)
+        print(f"    feedparser not available, using manual parser for {source_name}")
+        return fetch_rss_manual(url, source_name, limit)
     except Exception as e:
-        print(f"  {source_name} feedparser error: {e}, trying manual...")
-        return fetch_rss(url, source_name, limit)
+        print(f"    feedparser error for {source_name}: {type(e).__name__}: {e}")
+        print(f"    Falling back to manual parser for {source_name}")
+        return fetch_rss_manual(url, source_name, limit)
 
 def fetch_ithome():
     return fetch_with_feedparser("https://www.ithome.com/rss/", "IT之家", 8)
@@ -141,7 +167,9 @@ def generate_ideas(trends):
     return ideas
 
 def main():
-    print("Fetching trends from multiple sources...")
+    print(f"Fetching trends from multiple sources...")
+    print(f"Python version: {sys.version}")
+    print(f"Working directory: {os.getcwd()}")
     
     all_trends = []
     
@@ -157,14 +185,17 @@ def main():
     
     for name, fetch_func in sources:
         try:
+            print(f"\n  Fetching {name}...")
             trends = fetch_func()
             print(f"  {name}: {len(trends)} items")
             all_trends.extend(trends)
         except Exception as e:
-            print(f"  {name}: failed - {e}")
+            print(f"  {name}: CRITICAL ERROR - {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
     
     if not all_trends:
-        print("All sources failed, using fallback data")
+        print("\nAll sources failed, using fallback data")
         all_trends = get_fallback_trends()
     
     all_trends.sort(key=lambda x: x["heat"], reverse=True)
@@ -184,8 +215,9 @@ def main():
     with open("data/trends.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     
-    print(f"\nTotal: {len(all_trends)} trends, {len(ideas)} ideas")
-    print("Saved to data/trends.json")
+    print(f"\n=== SUCCESS ===")
+    print(f"Total: {len(all_trends)} trends, {len(ideas)} ideas")
+    print(f"Saved to data/trends.json")
 
 if __name__ == "__main__":
     main()

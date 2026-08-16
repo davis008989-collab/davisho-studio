@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DavisHo · 数码内容工作台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #fafbfc;
+  --surface: #ffffff;
+  --surface-hover: #f8f9fa;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border: #e5e7eb;
+  --accent: #ff2442;
+  --accent-light: #fff1f3;
+  --blue: #3b82f6;
+  --green: #10b981;
+  --orange: #f59e0b;
+  --purple: #8b5cf6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
+  --radius: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background particles */
+.particles {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.03;
+  animation: float 20s infinite ease-in-out;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-30px) rotate(120deg); }
+  66% { transform: translateY(15px) rotate(240deg); }
+}
+
+/* Layout */
+.app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0 24px;
+  animation: slideDown 0.6s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.brand {
+  display: flex; align-items: center; gap: 12px;
+}
+.brand-icon {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 16px rgba(255,36,66,0.3);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 4px 16px rgba(255,36,66,0.3); }
+  50% { box-shadow: 0 4px 24px rgba(255,36,66,0.5); }
+}
+.brand h1 { font-size: 18px; font-weight: 800; }
+.brand p { font-size: 12px; color: var(--text-secondary); }
+
+.header-actions { display: flex; gap: 10px; }
+.btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255,36,66,0.3);
+}
+.btn-primary:hover {
+  background: #e0203d;
+  box-shadow: 0 6px 24px rgba(255,36,66,0.4);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 24px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.8s ease 0.2s both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 400px; height: 400px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: rotate 30s linear infinite;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.hero h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; position: relative; }
+.hero p { font-size: 14px; opacity: 0.9; position: relative; }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.6s ease both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+  transition: transform 0.3s;
+}
+.stat-card:hover .stat-icon { transform: scale(1.1) rotate(-5deg); }
+.stat-label { font-size: 12px; color: var(--text-secondary); }
+.stat-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+
+/* Content grid */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  animation: fadeIn 0.6s ease both;
+  transition: all 0.3s;
+}
+.panel:hover {
+  box-shadow: var(--shadow-hover);
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.panel-title { font-size: 15px; font-weight: 700; }
+.panel-meta { font-size: 11px; color: var(--text-tertiary); }
+
+/* Trend items */
+.trend-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg);
+  margin-bottom: 8px;
+  transition: all 0.3s;
+  cursor: pointer;
+  animation: slideIn 0.4s ease both;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.trend-item:hover {
+  background: var(--surface-hover);
+  transform: translateX(4px);
+  box-shadow: var(--shadow);
+}
+.trend-rank {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.trend-item:hover .trend-rank { transform: scale(1.15); }
+.trend-rank.hot { background: var(--accent-light); color: var(--accent); }
+.trend-rank.warm { background: #fffbeb; color: var(--orange); }
+.trend-rank.normal { background: var(--bg); color: var(--text-tertiary); border: 1px solid var(--border); }
+.trend-body { flex: 1; min-width: 0; }
+.trend-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
+.trend-source { font-size: 11px; color: var(--text-tertiary); }
+.trend-heat {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+}
+.heat-bar {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.heat-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.8s ease;
+}
+
+/* Idea cards */
+.idea-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.5s ease both;
+}
+.idea-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--card-accent, var(--accent));
+  opacity: 0.7;
+  transition: height 0.3s;
+}
+.idea-card:hover::before { height: 5px; }
+.idea-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+.idea-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.idea-type {
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+.idea-card:hover .idea-type { transform: scale(1.05); }
+.idea-title { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
+.idea-footer { display: flex; gap: 8px; flex-wrap: wrap; }
+.idea-tag {
+  font-size: 11px; padding: 3px 10px; border-radius: 6px;
+  background: var(--bg); color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.idea-card:hover .idea-tag { background: var(--surface-hover); }
+.btn-gen {
+  width: 100%; margin-top: 12px;
+  padding: 12px; border: none; border-radius: 12px;
+  background: var(--text); color: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-gen::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--accent);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.btn-gen:hover::after { transform: translateX(0); }
+.btn-gen span { position: relative; z-index: 1; }
+
+/* Studio */
+.studio { display: none; }
+.studio.active { display: block; animation: fadeIn 0.4s ease; }
+.studio-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+.cover-box {
+  aspect-ratio: 3/4;
+  background: linear-gradient(135deg, #f0f0f5, #e8e8f0);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 2px dashed var(--border);
+  transition: all 0.3s;
+}
+.cover-box:hover { border-color: var(--accent); }
+.cover-box img { width: 100%; height: 100%; object-fit: cover; }
+
+.content-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+}
+.content-block:hover { box-shadow: var(--shadow); }
+.content-block h4 {
+  font-size: 12px; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  display: flex; justify-content: space-between;
+}
+.copy-btn {
+  font-size: 11px; padding: 4px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--text-secondary);
+  cursor: pointer; transition: all 0.2s;
+}
+.copy-btn:hover {
+  border-color: var(--green); color: var(--green);
+  background: #ecfdf5;
+}
+.content-text { font-size: 13px; line-height: 1.8; color: #374151; white-space: pre-wrap; }
+.content-text.title-text { font-size: 16px; font-weight: 700; color: var(--text); }
+
+/* Loading */
+.loading {
+  position: fixed; inset: 0;
+  background: rgba(250,251,252,0.95);
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  z-index: 100;
+}
+.loading.active { display: flex; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--green); color: #fff;
+  padding: 12px 24px; border-radius: 12px;
+  font-size: 13px; font-weight: 600;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  box-shadow: var(--shadow-hover);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .content { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .studio-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .stats { grid-template-columns: 1fr; }
+  .hero h2 { font-size: 18px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">📱</div>
+      <div>
+        <h1>DavisHo</h1>
+        <p>数码内容工作台</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="refreshData()">🔄 刷新</button>
+      <button class="btn btn-primary" onclick="showStudio()">🎬 素材工坊</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard">
+    <div class="hero">
+      <h2>👋 下午好，DavisHo</h2>
+      <p>今日数码圈有 <strong id="trendCount">--</strong> 个热门话题，已为你筛选出 <strong>5</strong> 条选题</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f3;">🔥</div>
+        <div class="stat-label">今日热点</div>
+        <div class="stat-value" style="color:var(--accent)" id="statTrends">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff;">💡</div>
+        <div class="stat-label">推荐选题</div>
+        <div class="stat-value" style="color:var(--blue)">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fffbeb;">📈</div>
+        <div class="stat-label">平均热度</div>
+        <div class="stat-value" style="color:var(--orange)">91</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ecfdf5;">✅</div>
+        <div class="stat-label">已生成</div>
+        <div class="stat-value" style="color:var(--green)" id="statGenerated">1</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Trends -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🔥 实时热点墙</div>
+          <span class="panel-meta">每30分钟自动更新</span>
+        </div>
+        <div id="trendList">
+          <div class="trend-item"><div class="trend-rank normal">1</div><div class="trend-body"><div class="trend-title">加载中...</div></div></div>
+        </div>
+      </div>
+
+      <!-- Ideas -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">💡 今日选题</div>
+          <span class="panel-meta">点击生成素材</span>
+        </div>
+        <div id="ideasList">
+          <div class="idea-card"><div class="idea-title">加载中...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio -->
+  <div class="studio" id="studio">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-icon">🎬</div>
+        <div>
+          <h1>素材工坊</h1>
+          <p>一键生成小红书素材</p>
+        </div>
+      </div>
+      <button class="btn" onclick="showDashboard()">← 返回仪表盘</button>
+    </div>
+
+    <div class="studio-grid">
+      <div>
+        <div class="content-block" style="padding:16px;">
+          <h4>🖼️ 封面图</h4>
+          <div class="cover-box" id="coverPreview">
+            <span style="color:var(--text-tertiary);font-size:13px;">选择选题后生成</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="content-block">
+          <h4>📌 标题 <button class="copy-btn" onclick="copy('title')">复制</button></h4>
+          <div class="content-text title-text" id="resultTitle">-</div>
+        </div>
+        <div class="content-block">
+          <h4>📝 正文 <button class="copy-btn" onclick="copy('caption')">复制</button></h4>
+          <div class="content-text" id="resultCaption">-</div>
+        </div>
+        <div class="content-block">
+          <h4>🏷️ 话题标签 <button class="copy-btn" onclick="copy('tags')">复制</button></h4>
+          <div class="content-text" id="resultTags">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div style="color:var(--text-secondary);font-size:14px;">生成中...</div>
+</div>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+// ── Particles ──
+const particlesContainer = document.getElementById('particles');
+for (let i = 0; i < 15; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.width = (Math.random() * 60 + 20) + 'px';
+  p.style.height = p.style.width;
+  p.style.left = Math.random() * 100 + '%';
+  p.style.top = Math.random() * 100 + '%';
+  p.style.background = ['#667eea', '#764ba2', '#f093fb', '#3b82f6'][Math.floor(Math.random() * 4)];
+  p.style.animationDelay = (Math.random() * 20) + 's';
+  p.style.animationDuration = (15 + Math.random() * 20) + 's';
+  particlesContainer.appendChild(p);
+}
+
+// ── Data ──
+let currentIdea = null;
+
+// Fallback data
+const FALLBACK_DATA = {
+  trends: [
+    { rank: 1, title: "华为Mate80爆料：麒麟9030+20GB+全系直屏", source: "IT之家", heat: 98 },
+    { rank: 2, title: "荣耀WIN2曝光：2nm骁龙8E5+10000mAh", source: "微博", heat: 95 },
+    { rank: 3, title: "小米17 Ultra首发2亿像素连续光变", source: "IT之家", heat: 92 },
+    { rank: 4, title: "努比亚Z90：全球首款AI智能体手机", source: "36氪", heat: 88 },
+    { rank: 5, title: "REDMI K90至尊版暂定4月见", source: "IT之家", heat: 86 },
+    { rank: 6, title: "vivo X300 Ultra超广角断层领先", source: "IT之家", heat: 84 },
+    { rank: 7, title: "国补+以旧换新：荣耀500 Pro下探3000", source: "什么值得买", heat: 82 },
+    { rank: 8, title: "iPhone Air带动eSIM倒逼国产跟进", source: "CounterPoint", heat: 78 },
+  ],
+  ideas: [
+    { id: 1, type: "爆料前瞻", typeColor: "#8b5cf6", typeBg: "#f5f3ff",
+      title: "华为Mate80这配置，5499起你冲不冲？🔥", heat: 96, tag: "华为" },
+    { id: 2, type: "对比测评", typeColor: "#3b82f6", typeBg: "#eff6ff",
+      title: "万毫安时代！荣耀WIN2 vs 红米K90续航对决🔋", heat: 94, tag: "续航" },
+    { id: 3, type: "价格红利", typeColor: "#10b981", typeBg: "#ecfdf5",
+      title: "不到3000拿下骁龙8至尊版，真香💰", heat: 91, tag: "国补" },
+    { id: 4, type: "体验分享", typeColor: "#f59e0b", typeBg: "#fffbeb",
+      title: "努比亚AI按键用了7天，说点大实话🤖", heat: 87, tag: "AI手机" },
+    { id: 5, type: "怀旧互动", typeColor: "#ef4444", typeBg: "#fef2f2",
+      title: "2026年手机都10000mAh了，你第一部电池多大？📱", heat: 85, tag: "怀旧" },
+  ]
+};
+
+// ── Render ──
+function renderTrends(trends) {
+  const list = document.getElementById('trendList');
+  list.innerHTML = trends.map((t, i) => {
+    const rankClass = t.heat >= 90 ? 'hot' : t.heat >= 80 ? 'warm' : 'normal';
+    const color = t.heat >= 90 ? 'var(--accent)' : t.heat >= 80 ? 'var(--orange)' : 'var(--green)';
+    return `
+      <div class="trend-item" style="animation-delay:${i * 0.05}s">
+        <div class="trend-rank ${rankClass}">${t.rank}</div>
+        <div class="trend-body">
+          <div class="trend-title">${t.title}</div>
+          <div class="trend-source">${t.source}</div>
+        </div>
+        <div class="trend-heat" style="color:${color}">
+          <span>${t.heat}</span>
+          <div class="heat-bar"><div class="heat-fill" style="width:${t.heat}%;background:${color}"></div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderIdeas(ideas) {
+  const list = document.getElementById('ideasList');
+  list.innerHTML = ideas.map((idea, i) => {
+    const color = idea.heat >= 90 ? 'var(--accent)' : idea.heat >= 85 ? 'var(--orange)' : 'var(--green)';
+    return `
+      <div class="idea-card" style="--card-accent:${idea.typeColor};animation-delay:${i * 0.1}s">
+        <div class="idea-header">
+          <span class="idea-type" style="background:${idea.typeBg};color:${idea.typeColor}">${idea.type}</span>
+          <div class="trend-heat" style="color:${color}">
+            <span>🔥 ${idea.heat}</span>
+            <div class="heat-bar"><div class="heat-fill" style="width:${idea.heat}%;background:${color}"></div></div>
+          </div>
+        </div>
+        <div class="idea-title">${idea.title}</div>
+        <div class="idea-footer">
+          <span class="idea-tag">#${idea.tag}</span>
+          <span class="idea-tag">🎬 小红书</span>
+        </div>
+        <button class="btn-gen" onclick="generate(${i})"><span>🚀 一键生成素材</span></button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Navigation ──
+function showDashboard() {
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('studio').classList.remove('active');
+}
+function showStudio() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('studio').classList.add('active');
+}
+
+// ── Generate ──
+function generate(idx) {
+  const idea = window._ideas[idx];
+  currentIdea = idea;
+  document.getElementById('loading').classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('active');
+
+    // 小红书真实规则：短标题 + 50-150字正文 + 3-5个标签
+    const title = idea.title;
+    const caption = generateCaption(idea);
+    const tags = generateTags(idea);
+
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('resultCaption').textContent = caption;
+    document.getElementById('resultTags').textContent = tags;
+
+    showStudio();
+  }, 800);
+}
+
+function generateCaption(idea) {
+  // 小红书真实规则：50-150字，2-5句话，口语化
+  const captions = {
+    "华为": "家人们，年底机圈最大悬念来了😱\n麒麟9030+20GB+全系直屏，这配置5499起\n所以你闭眼冲还是再等等？我先押Pro Max🙋",
+    "续航": "万毫安时代真的来了🔋\n荣耀WIN2和红米K90都上10000mAh\n实测对比见分晓，你站哪边？",
+    "国补": "国补+以旧换新太香了💰\n不到3000拿下骁龙8至尊版\n你们当地能减多少？评论区见",
+    "AI手机": "努比亚这个AI按键用了7天🤖\n有用还是噱头？说点大实话\n你觉得手机需要专门AI键吗？",
+    "怀旧": "2026年手机都10000mAh了📱\n还记得你第一部手机的电池多大吗？\n我的是诺基亚，1020mAh用了三年😂"
+  };
+  return captions[idea.tag] || `关于${idea.title.substring(0, 10)}...\n说点真实体验\n你怎么看？`;
+}
+
+function generateTags(idea) {
+  const tagMap = {
+    "华为": "#华为Mate80 #麒麟9030 #数码爆料 #国产手机 #小红书",
+    "续航": "#万毫安电池 #荣耀WIN2 #红米K90 #续航测试 #数码",
+    "国补": "#国补 #以旧换新 #骁龙8至尊版 #性价比 #数码好物",
+    "AI手机": "#AI手机 #努比亚 #智能体 #数码体验 #科技",
+    "怀旧": "#怀旧 #第一部手机 #电池容量 #数码回忆 #老手机"
+  };
+  return tagMap[idea.tag] || "#数码 #手机 #科技 #数码好物 #小红书";
+}
+
+// ── Copy ──
+function copy(field) {
+  let text = '';
+  if (field === 'title') text = document.getElementById('resultTitle').textContent;
+  else if (field === 'caption') text = document.getElementById('resultCaption').textContent;
+  else if (field === 'tags') text = document.getElementById('resultTags').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── Load Data ──
+async function loadData() {
+  try {
+    const res = await fetch('data/trends.json?t=' + Date.now());
+    const data = await res.json();
+    window._trends = data.trends || FALLBACK_DATA.trends;
+    window._ideas = data.ideas || FALLBACK_DATA.ideas;
+  } catch (e) {
+    window._trends = FALLBACK_DATA.trends;
+    window._ideas = FALLBACK_DATA.ideas;
+  }
+  renderTrends(window._trends);
+  renderIdeas(window._ideas);
+  document.getElementById('trendCount').textContent = window._trends.length;
+  document.getElementById('statTrends').textContent = window._trends.length;
+}
+
+function refreshData() {
+  loadData();
+  showToast('数据已刷新');
+}
+
+// Auto refresh every 30 minutes
+setInterval(() => {
+  loadData();
+}, 30 * 60 * 1000);
+
+// Init
+loadData();
+</script>
+
+</body>
+</html>
